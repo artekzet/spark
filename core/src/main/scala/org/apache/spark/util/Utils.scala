@@ -1089,7 +1089,7 @@ private[spark] object Utils extends Logging {
     addBracketsIfNeeded(customHostname.getOrElse(InetAddresses.toUriString(localIpAddress)))
   }
 
-  private def addBracketsIfNeeded(addr: String): String = {
+  private[spark] def addBracketsIfNeeded(addr: String): String = {
     if (addr.contains(":") && !addr.contains("[")) {
       "[" + addr + "]"
     } else {
@@ -1908,18 +1908,9 @@ private[spark] object Utils extends Logging {
   }
 
   /**
-   * Counts the number of elements of an iterator using a while loop rather than calling
-   * [[scala.collection.Iterator#size]] because it uses a for loop, which is slightly slower
-   * in the current version of Scala.
+   * Counts the number of elements of an iterator.
    */
-  def getIteratorSize(iterator: Iterator[_]): Long = {
-    var count = 0L
-    while (iterator.hasNext) {
-      count += 1L
-      iterator.next()
-    }
-    count
-  }
+  def getIteratorSize(iterator: Iterator[_]): Long = Iterators.size(iterator)
 
   /**
    * Generate a zipWithIndex iterator, avoid index value overflowing problem
@@ -1987,6 +1978,11 @@ private[spark] object Utils extends Logging {
    * Whether the underlying operating system is Mac OS X and processor is Apple Silicon.
    */
   val isMacOnAppleSilicon = SystemUtils.IS_OS_MAC_OSX && SystemUtils.OS_ARCH.equals("aarch64")
+
+  /**
+   * Whether the underlying JVM prefer IPv6 addresses.
+   */
+  val preferIPv6 = "true".equals(System.getProperty("java.net.preferIPv6Addresses"))
 
   /**
    * Pattern for matching a Windows drive, which contains only a single alphabet character.

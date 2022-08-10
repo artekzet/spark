@@ -733,7 +733,7 @@ object IntervalUtils {
    * @throws ArithmeticException if the result overflows any field value or divided by zero
    */
   def divideExact(interval: CalendarInterval, num: Double): CalendarInterval = {
-    if (num == 0) throw QueryExecutionErrors.divideByZeroError("")
+    if (num == 0) throw QueryExecutionErrors.intervalDividedByZeroError(null)
     fromDoubles(interval.months / num, interval.days / num, interval.microseconds / num)
   }
 
@@ -1343,6 +1343,15 @@ object IntervalUtils {
       case HOUR => v / MICROS_PER_HOUR
       case MINUTE => v / MICROS_PER_MINUTE
       case SECOND => v / MICROS_PER_SECOND
+    }
+  }
+
+  def dayTimeIntervalToDecimal(v: Long, endField: Byte): Decimal = {
+    endField match {
+      case DAY => Decimal(v / MICROS_PER_DAY)
+      case HOUR => Decimal(v / MICROS_PER_HOUR)
+      case MINUTE => Decimal(v / MICROS_PER_MINUTE)
+      case SECOND => Decimal(v, Decimal.MAX_LONG_DIGITS, 6)
     }
   }
 

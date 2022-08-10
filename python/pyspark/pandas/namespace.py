@@ -238,7 +238,7 @@ def read_csv(
     path : str
         The path string storing the CSV file to be read.
     sep : str, default ‘,’
-        Delimiter to use. Must be a single character.
+        Delimiter to use. Non empty string.
     header : int, default ‘infer’
         Whether to to use as the column names, and the start of the data.
         Default behavior is to infer the column names: if no names are passed
@@ -278,7 +278,7 @@ def read_csv(
         The character used to denote the start and end of a quoted item. Quoted items can include
         the delimiter and it will be ignored.
     escapechar : str (length 1), default None
-        One-character string used to escape delimiter
+        One-character string used to escape other characters.
     comment: str, optional
         Indicates the line should not be parsed.
     encoding: str, optional
@@ -2621,9 +2621,8 @@ def concat(
 
             assert len(merged_columns) > 0
 
-            # If sort is True, always sort when there are more than two Series,
-            # and if there is only one Series, never sort to follow pandas 1.4+ behavior.
-            if sort and num_series != 1:
+            # If sort is True, always sort
+            if sort:
                 # FIXME: better ordering
                 merged_columns = sorted(merged_columns, key=name_like_string)
 

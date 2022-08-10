@@ -456,6 +456,7 @@ object FunctionRegistry {
     expression[TryAverage]("try_avg"),
     expression[TrySum]("try_sum"),
     expression[TryToBinary]("try_to_binary"),
+    expressionBuilder("try_to_timestamp", TryToTimestampExpressionBuilder, setAlias = true),
 
     // aggregate functions
     expression[HyperLogLogPlusPlus]("approx_count_distinct"),
@@ -491,7 +492,7 @@ object FunctionRegistry {
     expression[VariancePop]("var_pop"),
     expression[VarianceSamp]("var_samp"),
     expression[CollectList]("collect_list"),
-    expression[CollectList]("array_agg", true),
+    expression[CollectList]("array_agg", true, Some("3.3.0")),
     expression[CollectSet]("collect_set"),
     expression[CountMinSketchAgg]("count_min_sketch"),
     expression[BoolAnd]("every", true),
@@ -508,6 +509,7 @@ object FunctionRegistry {
     expression[RegrSYY]("regr_syy"),
     expression[RegrSlope]("regr_slope"),
     expression[RegrIntercept]("regr_intercept"),
+    expression[Mode]("mode"),
 
     // string functions
     expression[Ascii]("ascii"),
@@ -530,7 +532,6 @@ object FunctionRegistry {
     expression[ToNumber]("to_number"),
     expression[TryToNumber]("try_to_number"),
     expression[ToCharacter]("to_char"),
-    expression[TryToCharacter]("try_to_char"),
     expression[GetJsonObject]("get_json_object"),
     expression[InitCap]("initcap"),
     expression[StringInstr]("instr"),
@@ -545,7 +546,6 @@ object FunctionRegistry {
     expressionBuilder("lpad", LPadExpressionBuilder),
     expression[StringTrimLeft]("ltrim"),
     expression[JsonTuple]("json_tuple"),
-    expression[ParseUrl]("parse_url"),
     expression[StringLocate]("position", true),
     expression[FormatString]("printf", true),
     expression[RegExpExtract]("regexp_extract"),
@@ -585,6 +585,14 @@ object FunctionRegistry {
     expression[XPathLong]("xpath_long"),
     expression[XPathShort]("xpath_short"),
     expression[XPathString]("xpath_string"),
+    expression[RegExpCount]("regexp_count"),
+    expression[RegExpSubStr]("regexp_substr"),
+    expression[RegExpInStr]("regexp_instr"),
+
+    // url functions
+    expression[UrlEncode]("url_encode"),
+    expression[UrlDecode]("url_decode"),
+    expression[ParseUrl]("parse_url"),
 
     // datetime functions
     expression[AddMonths]("add_months"),

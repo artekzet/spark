@@ -148,9 +148,11 @@ case class RowDataSourceScanExec(
           s"ORDER BY ${seqToString(pushedDownOperators.sortValues.map(_.describe()))}" +
           s" LIMIT ${pushedDownOperators.limit.get}"
         Some("PushedTopN" -> pushedTopN)
-    } else {
-      pushedDownOperators.limit.map(value => "PushedLimit" -> s"LIMIT $value")
-    }
+      } else {
+        pushedDownOperators.limit.map(value => "PushedLimit" -> s"LIMIT $value")
+      }
+
+    val offsetInfo = pushedDownOperators.offset.map(value => "PushedOffset" -> s"OFFSET $value")
 
     val pushedFilters = if (pushedDownOperators.pushedPredicates.nonEmpty) {
       seqToString(pushedDownOperators.pushedPredicates.map(_.describe()))
@@ -164,6 +166,7 @@ case class RowDataSourceScanExec(
         Map("PushedAggregates" -> seqToString(v.aggregateExpressions.map(_.describe())),
           "PushedGroupByExpressions" -> seqToString(v.groupByExpressions.map(_.describe())))} ++
       topNOrLimitInfo ++
+      offsetInfo ++
       pushedDownOperators.sample.map(v => "PushedSample" ->
         s"SAMPLE (${(v.upperBound - v.lowerBound) * 100}) ${v.withReplacement} SEED(${v.seed})"
       )
@@ -647,7 +650,9 @@ case class FileSourceScanExec(
     }
 
     new FileScanRDD(fsRelation.sparkSession, readFile, filePartitions,
-      requiredSchema, metadataColumns, new FileSourceOptions(CaseInsensitiveMap(relation.options)))
+      new StructType(requiredSchema.fields ++ fsRelation.partitionSchema.fields), metadataColumns,
+      new FileSourceOptions(CaseInsensitiveMap(relation.options)))
+
   }
 
   /**
@@ -704,7 +709,8 @@ case class FileSourceScanExec(
       FilePartition.getFilePartitions(relation.sparkSession, splitFiles, maxSplitBytes)
 
     new FileScanRDD(fsRelation.sparkSession, readFile, partitions,
-      requiredSchema, metadataColumns, new FileSourceOptions(CaseInsensitiveMap(relation.options)))
+      new StructType(requiredSchema.fields ++ fsRelation.partitionSchema.fields), metadataColumns,
+      new FileSourceOptions(CaseInsensitiveMap(relation.options)))
   }
 
   // Filters unused DynamicPruningExpression expressions - one which has been replaced

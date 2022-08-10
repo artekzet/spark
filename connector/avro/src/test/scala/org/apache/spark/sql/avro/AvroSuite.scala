@@ -2335,7 +2335,7 @@ class AvroV2Suite extends AvroSuite with ExplainSuiteHelper {
       })
 
       val fileScan = df.queryExecution.executedPlan collectFirst {
-        case BatchScanExec(_, f: AvroScan, _, _) => f
+        case BatchScanExec(_, f: AvroScan, _, _, _) => f
       }
       assert(fileScan.nonEmpty)
       assert(fileScan.get.partitionFilters.nonEmpty)
@@ -2368,7 +2368,7 @@ class AvroV2Suite extends AvroSuite with ExplainSuiteHelper {
       assert(filterCondition.isDefined)
 
       val fileScan = df.queryExecution.executedPlan collectFirst {
-        case BatchScanExec(_, f: AvroScan, _, _) => f
+        case BatchScanExec(_, f: AvroScan, _, _, _) => f
       }
       assert(fileScan.nonEmpty)
       assert(fileScan.get.partitionFilters.isEmpty)
@@ -2408,7 +2408,7 @@ class AvroV2Suite extends AvroSuite with ExplainSuiteHelper {
       val basePath = dir.getCanonicalPath + "/avro"
       val expected_plan_fragment =
         s"""
-           |\\(1\\) BatchScan
+           |\\(1\\) BatchScan avro
            |Output \\[2\\]: \\[value#xL, id#x\\]
            |DataFilters: \\[isnotnull\\(value#xL\\), \\(value#xL > 2\\)\\]
            |Format: avro
@@ -2449,7 +2449,7 @@ class AvroV2Suite extends AvroSuite with ExplainSuiteHelper {
             .where("value = 'a'")
 
           val fileScan = df.queryExecution.executedPlan collectFirst {
-            case BatchScanExec(_, f: AvroScan, _, _) => f
+            case BatchScanExec(_, f: AvroScan, _, _, _) => f
           }
           assert(fileScan.nonEmpty)
           if (filtersPushdown) {

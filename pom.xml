@@ -109,13 +109,13 @@
     <java.version>1.8</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
-    <maven.version>3.8.4</maven.version>
+    <maven.version>3.8.6</maven.version>
     <exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
     <sbt.project.name>spark</sbt.project.name>
-    <slf4j.version>1.7.32</slf4j.version>
-    <log4j.version>2.17.2</log4j.version>
+    <slf4j.version>1.7.36</slf4j.version>
+    <log4j.version>2.18.0</log4j.version>
     <!-- make sure to update IsolatedClientLoader whenever this version is changed -->
-    <hadoop.version>3.3.3</hadoop.version>
+    <hadoop.version>3.3.4</hadoop.version>
     <protobuf.version>2.5.0</protobuf.version>
     <yarn.version>${hadoop.version}</yarn.version>
     <zookeeper.version>3.6.2</zookeeper.version>
@@ -128,12 +128,12 @@
     <!-- Version used for internal directory structure -->
     <hive.version.short>2.3</hive.version.short>
     <!-- note that this should be compatible with Kafka brokers version 0.10 and up -->
-    <kafka.version>3.2.0</kafka.version>
+    <kafka.version>3.2.1</kafka.version>
     <!-- After 10.15.1.3, the minimum required version is JDK9 -->
     <derby.version>10.14.2.0</derby.version>
     <parquet.version>1.12.3</parquet.version>
-    <orc.version>1.7.4</orc.version>
-    <jetty.version>9.4.46.v20220331</jetty.version>
+    <orc.version>1.7.5</orc.version>
+    <jetty.version>9.4.48.v20220622</jetty.version>
     <jakartaservlet.version>4.0.3</jakartaservlet.version>
     <chill.version>0.10.0</chill.version>
     <ivy.version>2.5.0</ivy.version>
@@ -142,7 +142,7 @@
     If you changes codahale.metrics.version, you also need to change
     the link to metrics.dropwizard.io in docs/monitoring.md.
     -->
-    <codahale.metrics.version>4.2.7</codahale.metrics.version>
+    <codahale.metrics.version>4.2.10</codahale.metrics.version>
     <!-- Should be consistent with SparkBuild.scala and docs -->
     <avro.version>1.11.0</avro.version>
     <aws.kinesis.client.version>1.12.0</aws.kinesis.client.version>
@@ -159,14 +159,17 @@
     <commons.collections4.version>4.4</commons.collections4.version>
     <scala.version>2.12.16</scala.version>
     <scala.binary.version>2.12</scala.binary.version>
-    <scalatest-maven-plugin.version>2.0.2</scalatest-maven-plugin.version>
+    <scalatest-maven-plugin.version>2.1.0</scalatest-maven-plugin.version>
     <!--
       This needs to be managed in different profiles to avoid
       errors building different Hadoop versions.
       See: SPARK-36547, SPARK-38394.
        -->
-
-    <scala-maven-plugin.version>4.6.2</scala-maven-plugin.version>
+    <!--
+      SPARK-39502: Please don't upgrade the version to 4.6.2 due to
+      there is a compilation issue when run `mvn test` with Java 8
+      -->
+    <scala-maven-plugin.version>4.6.1</scala-maven-plugin.version>
     <!-- for now, not running scalafmt as part of default verify pipeline -->
     <scalafmt.skip>true</scalafmt.skip>
     <codehaus.jackson.version>1.9.13</codehaus.jackson.version>
@@ -186,16 +189,16 @@
     <commons-pool2.version>2.11.1</commons-pool2.version>
     <datanucleus-core.version>4.1.17</datanucleus-core.version>
     <guava.version>14.0.1</guava.version>
-    <janino.version>3.0.16</janino.version>
-    <jersey.version>2.35</jersey.version>
-    <joda.version>2.10.13</joda.version>
+    <janino.version>3.1.7</janino.version>
+    <jersey.version>2.36</jersey.version>
+    <joda.version>2.10.14</joda.version>
     <jodd.version>3.5.2</jodd.version>
     <jsr305.version>3.0.0</jsr305.version>
     <libthrift.version>0.12.0</libthrift.version>
     <antlr4.version>4.8</antlr4.version>
     <jpam.version>1.1</jpam.version>
     <selenium.version>3.141.59</selenium.version>
-    <htmlunit.version>2.50.0</htmlunit.version>
+    <htmlunit.version>2.62.0</htmlunit.version>
     <maven-antrun.version>1.8</maven-antrun.version>
     <commons-crypto.version>1.1.0</commons-crypto.version>
     <commons-cli.version>1.5.0</commons-cli.version>
@@ -210,10 +213,10 @@
     If you are changing Arrow version specification, please check
     ./python/pyspark/sql/pandas/utils.py, and ./python/setup.py too.
     -->
-    <arrow.version>8.0.0</arrow.version>
+    <arrow.version>9.0.0</arrow.version>
     <!-- org.fusesource.leveldbjni will be used except on arm64 platform. -->
     <leveldbjni.group>org.fusesource.leveldbjni</leveldbjni.group>
-    <kubernetes-client.version>5.12.2</kubernetes-client.version>
+    <kubernetes-client.version>5.12.3</kubernetes-client.version>
 
     <test.java.home>${java.home}</test.java.home>
 
@@ -469,7 +472,7 @@
       <dependency>
         <groupId>org.apache.xbean</groupId>
         <artifactId>xbean-asm9-shaded</artifactId>
-        <version>4.20</version>
+        <version>4.21</version>
       </dependency>
 
       <!-- Shaded deps marked as provided. These are promoted to compile scope
@@ -675,7 +678,7 @@
       <dependency>
         <groupId>org.rocksdb</groupId>
         <artifactId>rocksdbjni</artifactId>
-        <version>7.2.2</version>
+        <version>7.4.4</version>
       </dependency>
       <dependency>
         <groupId>${leveldbjni.group}</groupId>
@@ -819,7 +822,7 @@
       <dependency>
         <groupId>org.roaringbitmap</groupId>
         <artifactId>RoaringBitmap</artifactId>
-        <version>0.9.28</version>
+        <version>0.9.30</version>
       </dependency>
 
       <!-- Netty Begin -->
@@ -1081,7 +1084,7 @@
       <dependency>
         <groupId>org.scalanlp</groupId>
         <artifactId>breeze_${scala.binary.version}</artifactId>
-        <version>1.2</version>
+        <version>2.0</version>
         <exclusions>
           <exclusion>
             <groupId>org.apache.commons</groupId>
@@ -1092,7 +1095,7 @@
       <dependency>
         <groupId>com.chuusai</groupId>
         <artifactId>shapeless_${scala.binary.version}</artifactId>
-        <version>2.3.7</version>
+        <version>2.3.9</version>
       </dependency>
       <dependency>
         <groupId>org.json4s</groupId>
@@ -1215,7 +1218,7 @@
       <dependency>
         <groupId>mysql</groupId>
         <artifactId>mysql-connector-java</artifactId>
-        <version>8.0.27</version>
+        <version>8.0.30</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -3151,12 +3154,12 @@
             <dependency>
               <groupId>org.ow2.asm</groupId>
               <artifactId>asm</artifactId>
-              <version>9.1</version>
+              <version>9.3</version>
             </dependency>
             <dependency>
               <groupId>org.ow2.asm</groupId>
               <artifactId>asm-commons</artifactId>
-              <version>9.1</version>
+              <version>9.3</version>
             </dependency>
           </dependencies>
         </plugin>
@@ -3742,26 +3745,6 @@
         <maven.surefire.debug>${jdwp.arg.line}</maven.surefire.debug>
         <debugForkedProcess>${test.debug.suite}</debugForkedProcess>
       </properties>
-    </profile>
-
-    <!--
-      Deprecated: com.github.fommil.netlib has been replaced by dev.ludovic.netlib which
-      doesn't package or distribute any GPL/LGPL dependencies. There should now be hardware
-      acceleration out-of-the-box without enabling any additional profile.
-      However, we need to keep the dependency for now because the last release of
-      org.scalanlp:breeze still depends on `com.github.fommil.netlib`. It's been updated with
-      https://github.com/scalanlp/breeze/pull/811 but it hasn't been released yet.
-    -->
-    <profile>
-      <id>netlib-lgpl</id>
-      <dependencies>
-        <dependency>
-          <groupId>com.github.fommil.netlib</groupId>
-          <artifactId>all</artifactId>
-          <version>${netlib.java.version}</version>
-          <type>pom</type>
-        </dependency>
-      </dependencies>
     </profile>
     <profile>
       <id>only-eclipse</id>

@@ -24,7 +24,7 @@ import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.catalyst.dsl.expressions._
 import org.apache.spark.sql.catalyst.dsl.plans._
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.catalyst.expressions.aggregate.{AggregateExpression, Complete, Count, Max}
+import org.apache.spark.sql.catalyst.expressions.aggregate.{Count, Max}
 import org.apache.spark.sql.catalyst.parser.CatalystSqlParser
 import org.apache.spark.sql.catalyst.plans.{Cross, LeftOuter, RightOuter}
 import org.apache.spark.sql.catalyst.plans.logical._
@@ -172,7 +172,7 @@ class AnalysisErrorSuite extends AnalysisTest {
     "distinct aggregate function in window",
     testRelation2.select(
       WindowExpression(
-        AggregateExpression(Count(UnresolvedAttribute("b")), Complete, isDistinct = true),
+        Count(UnresolvedAttribute("b")).toAggregateExpression(isDistinct = true),
         WindowSpecDefinition(
           UnresolvedAttribute("a") :: Nil,
           SortOrder(UnresolvedAttribute("b"), Ascending) :: Nil,
@@ -183,11 +183,8 @@ class AnalysisErrorSuite extends AnalysisTest {
     "window aggregate function with filter predicate",
     testRelation2.select(
       WindowExpression(
-        AggregateExpression(
-          Count(UnresolvedAttribute("b")),
-          Complete,
-          isDistinct = false,
-          filter = Some(UnresolvedAttribute("b") > 1)),
+        Count(UnresolvedAttribute("b"))
+          .toAggregateExpression(isDistinct = false, filter = Some(UnresolvedAttribute("b") > 1)),
         WindowSpecDefinition(
           UnresolvedAttribute("a") :: Nil,
           SortOrder(UnresolvedAttribute("b"), Ascending) :: Nil,
@@ -249,10 +246,7 @@ class AnalysisErrorSuite extends AnalysisTest {
   errorTest(
     "nested aggregate functions",
     testRelation.groupBy($"a")(
-      AggregateExpression(
-        Max(AggregateExpression(Count(Literal(1)), Complete, isDistinct = false)),
-        Complete,
-        isDistinct = false)),
+      Max(Count(Literal(1)).toAggregateExpression()).toAggregateExpression()),
     "not allowed to use an aggregate function in the argument of another aggregate function." :: Nil
   )
 
@@ -297,16 +291,16 @@ class AnalysisErrorSuite extends AnalysisTest {
   errorClassTest(
     "unresolved attributes",
     testRelation.select($"abcd"),
-    "MISSING_COLUMN",
-    Array("abcd", "a"))
+    "UNRESOLVED_COLUMN",
+    Array("`abcd`", "`a`"))
 
   errorClassTest(
     "unresolved attributes with a generated name",
     testRelation2.groupBy($"a")(max($"b"))
       .where(sum($"b") > 0)
       .orderBy($"havingCondition".asc),
-    "MISSING_COLUMN",
-    Array("havingCondition", "max(b)"))
+    "UNRESOLVED_COLUMN",
+    Array("`havingCondition`", "`max(b)`"))
 
   errorTest(
     "unresolved star expansion in max",
@@ -321,8 +315,8 @@ class AnalysisErrorSuite extends AnalysisTest {
   errorClassTest(
     "sorting by attributes are not from grouping expressions",
     testRelation2.groupBy($"a", $"c")($"a", $"c", count($"a").as("a3")).orderBy($"b".asc),
-    "MISSING_COLUMN",
-    Array("b", "a, c, a3"))
+    "UNRESOLVED_COLUMN",
+    Array("`b`", "`a`, `c`, `a3`"))
 
   errorTest(
     "non-boolean filters",
@@ -415,8 +409,8 @@ class AnalysisErrorSuite extends AnalysisTest {
     "SPARK-9955: correct error message for aggregate",
     // When parse SQL string, we will wrap aggregate expressions with UnresolvedAlias.
     testRelation2.where($"bad_column" > 1).groupBy($"a")(UnresolvedAlias(max($"b"))),
-    "MISSING_COLUMN",
-    Array("bad_column", "a, b, c, d, e"))
+    "UNRESOLVED_COLUMN",
+    Array("`bad_column`", "`a`, `b`, `c`, `d`, `e`"))
 
   errorTest(
     "slide duration greater than window in time window",
@@ -836,7 +830,8 @@ class AnalysisErrorSuite extends AnalysisTest {
   errorTest(
     "SPARK-34920: error code to error message",
     testRelation2.where($"bad_column" > 1).groupBy($"a")(UnresolvedAlias(max($"b"))),
-    "Column 'bad_column' does not exist. Did you mean one of the following? [a, b, c, d, e]"
+    "[UNRESOLVED_COLUMN] A column or function parameter with name `bad_column` cannot be " +
+      "resolved. Did you mean one of the following? [`a`, `b`, `c`, `d`, `e`]"
       :: Nil)
 
   test("SPARK-35080: Unsupported correlated equality predicates in subquery") {

@@ -27,6 +27,7 @@ from typing import Any, Callable, Dict, List, NamedTuple, Set, TextIO, Tuple
 import pyspark.pandas as ps
 import pyspark.pandas.groupby as psg
 import pyspark.pandas.window as psw
+from pyspark.pandas.exceptions import PandasNotImplementedError
 
 import pandas as pd
 import pandas.core.groupby as pdg
@@ -131,15 +132,27 @@ def _create_supported_by_module(
     pd_module = getattr(pd_module_group, module_name) if module_name else pd_module_group
     try:
         ps_module = getattr(ps_module_group, module_name) if module_name else ps_module_group
-    except AttributeError:
+    except (AttributeError, PandasNotImplementedError):
         # module not implemented
         return {}
 
-    pd_funcs = dict([m for m in getmembers(pd_module, isfunction) if not m[0].startswith("_")])
+    pd_funcs = dict(
+        [
+            m
+            for m in getmembers(pd_module, isfunction)
+            if not m[0].startswith("_") and m[0] in pd_module.__dict__
+        ]
+    )
     if not pd_funcs:
         return {}
 
-    ps_funcs = dict([m for m in getmembers(ps_module, isfunction) if not m[0].startswith("_")])
+    ps_funcs = dict(
+        [
+            m
+            for m in getmembers(ps_module, isfunction)
+            if not m[0].startswith("_") and m[0] in ps_module.__dict__
+        ]
+    )
 
     return _organize_by_implementation_status(
         module_name, pd_funcs, ps_funcs, pd_module_group, ps_module_group
@@ -250,7 +263,7 @@ def _transform_missing(
 
 def _get_pd_modules(pd_module_group: Any) -> List[str]:
     """
-    Returns sorted pandas memeber list from pandas module path.
+    Returns sorted pandas member list from pandas module path.
 
     Parameters
     ----------
